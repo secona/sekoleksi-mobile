@@ -100,11 +100,13 @@ Class `ItemHomepage` digunakan sebagai penyimpan data yang diperlukan oleh class
 Pada class `HomePage`, mendefinisikan variabel baru `items` yang akan digunakan sebagai data tombol melalui `GridView`.
 
 ```dart
-final List<ItemHomepage> items = [
-  ItemHomepage("Lihat Mood", Icons.mood, Colors.red),
-  ItemHomepage("Tambah Mood", Icons.add, Colors.green),
-  ItemHomepage("Logout", Icons.logout, Colors.blue),
-];
+// ...
+  final List<ItemHomepage> items = [
+    ItemHomepage("Lihat Daftar Produk", Icons.inventory_2, Colors.red),
+    ItemHomepage("Tambah Produk", Icons.add, Colors.green),
+    ItemHomepage("Logout", Icons.logout, Colors.blue),
+  ];
+// ...
 
 // ...
 GridView.count(
@@ -120,11 +122,13 @@ GridView.count(
 Setiap class `ItemHomepage` menyimpan data berupa warna yang digunakan untuk menampilkan warna yang berbeda untuk setiap instance dari `ItemHomepage`. Warna yang saya gunakan adalah merah, hijau, dan biru.
 
 ```dart
-final List<ItemHomepage> items = [
-  ItemHomepage("Lihat Mood", Icons.mood, Colors.red),
-  ItemHomepage("Tambah Mood", Icons.add, Colors.green),
-  ItemHomepage("Logout", Icons.logout, Colors.blue),
-];
+// ...
+  final List<ItemHomepage> items = [
+    ItemHomepage("Lihat Daftar Produk", Icons.inventory_2, Colors.red),
+    ItemHomepage("Tambah Produk", Icons.add, Colors.green),
+    ItemHomepage("Logout", Icons.logout, Colors.blue),
+  ];
+// ...
 
 // ...
   @override
