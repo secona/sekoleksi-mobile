@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sekoleksi_mobile/home.dart';
+import 'package:sekoleksi_mobile/screens/home.dart';
+import 'package:sekoleksi_mobile/screens/product_form.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(),
+        '/product-form': (context) => const ProductFormPage(),
+      }
     );
   }
 }

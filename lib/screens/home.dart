@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sekoleksi_mobile/widgets/left_drawer.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -8,9 +9,9 @@ class HomePage extends StatelessWidget {
   final String className = 'PBP F';
 
   final List<ItemHomepage> items = [
-    ItemHomepage("Lihat Daftar Produk", Icons.inventory_2, Colors.red),
-    ItemHomepage("Tambah Produk", Icons.add, Colors.green),
-    ItemHomepage("Logout", Icons.logout, Colors.blue),
+    ItemHomepage("Lihat Daftar Produk", Icons.inventory_2_outlined, Colors.red, ''),
+    ItemHomepage("Tambah Produk", Icons.add, Colors.green, '/product-form'),
+    ItemHomepage("Logout", Icons.logout, Colors.blue, ''),
   ];
 
   @override
@@ -23,6 +24,7 @@ class HomePage extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer)
         ),
       ),
+      drawer: const LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Padding(
@@ -50,8 +52,9 @@ class ItemHomepage {
   final String name;
   final IconData icon;
   final Color color;
+  final String route;
 
-  ItemHomepage(this.name, this.icon, this.color);
+  ItemHomepage(this.name, this.icon, this.color, this.route);
 }
 
 class ItemCard extends StatelessWidget {
@@ -71,6 +74,10 @@ class ItemCard extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(
                 content: Text("Kamu telah menekan tombol ${item.name}")));
+
+          if (item.route != "") {
+            Navigator.pushNamed(context, item.route);
+          }
         },
         child: Container(
           padding: const EdgeInsets.all(8),
