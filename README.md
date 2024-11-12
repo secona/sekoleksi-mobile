@@ -155,3 +155,95 @@ Pada `ItemCard`, terdapat widget `InkWell` yang dapat digunakan untuk mendeteksi
 ```
 
 </details>
+
+<details>
+<summary>:blue_book: Tugas 8</summary>
+
+## :blue_book: Tugas 8
+
+### :arrow_right: Apa kegunaan const di Flutter? Jelaskan apa keuntungan ketika menggunakan const pada kode Flutter. Kapan sebaiknya kita menggunakan const, dan kapan sebaiknya tidak digunakan?
+Kegunaan `const` dalam Flutter adalah untuk mendeklarasikan konstanta yang tidak akan berubah selama siklus hidup aplikasi. Beberapa keuntungan `const` adalah sebagai berikut.
+- **Menghemat memori**: Flutter hanya membuat 1 instance dari objek yang diberi `const`. Jika objek tersebut digunakan berulang kali, Flutter akan menggunakan ulang objek yang sudah dibuat.
+- **Mempercepat build time**: Karena widgetnya tidak akan berubah, Flutter tidak perlu menggambar ulang widget tersebut ketika sebuah _state_ berubah.
+- **Mempermudah prediktabilitas dan _debugging_**: Mirip seperti poin sebelumnya, Flutter tidak akan mengubah widget dengan `const`. Ini akan mempermudah karena setelah widget tersebut dibuat, _state_-nya tidak dapat diubah, mengeliminasi masalah-masalah yang berkaitan dengan state.
+
+Tidak semua widget di Flutter pantas untuk digunakan `const`. Hanya widget yang tidak akan berubah, seperti yang tidak memiliki state, yang dapat digunakan `const`. Jika `const` digunakan ke widget dengan state yang akan berubah, widget tersebut tidak akan diperbarui tampilannya. 
+
+### :arrow_right: Jelaskan dan bandingkan penggunaan Column dan Row pada Flutter. Berikan contoh implementasi dari masing-masing layout widget ini!
+Column menyusun anak-anaknya secara vertikal dari atas ke bawah. Column cocok digunakan ketika ingin menampilkan elemen-elemen dalam satu kolom seperti pada form atau list. Column biasanya diatur menggunakan `mainAxisAlignment` dan `crossAxisAlignment` untuk posisi vertikal dan horizontal elemen-elemen di dalamnya.
+
+Row menyusun anak-anaknya secara horizontal dari kiri ke kanan. Row cocok digunakan ketika ingin menampilkan elemen-elemen dalam satu baris seperti tombol, ikon, atau informasi yang disusun sejajar. Sama seperti Column, Row biasanya diatur menggunakan `mainAxisAlignment` dan `crossAxisAlignment` untuk posisi elemen-elemen di dalamnya.
+
+### :arrow_right: Sebutkan apa saja elemen input yang kamu gunakan pada halaman form yang kamu buat pada tugas kali ini. Apakah terdapat elemen input Flutter lain yang tidak kamu gunakan pada tugas ini? Jelaskan!
+Pada halaman form, saya menggunakan widget `TextFormInput` supaya dapat berintegrasi dengan widget `Form`.
+
+### :arrow_right: Bagaimana cara kamu mengatur tema (theme) dalam aplikasi Flutter agar aplikasi yang dibuat konsisten? Apakah kamu mengimplementasikan tema pada aplikasi yang kamu buat?
+Tema dalam aplikasi Flutter diatur dari MaterialApp pada berkas `lib/main.dart`.
+
+```dart
+// ...
+ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+  useMaterial3: true,
+)
+// ...
+```
+
+Data tema ini dapat digunakan melalui variabel `context` yang diberikan pada method `build` dalam semua bagian dari aplikasi Flutter supaya warna yang digunakan konsisten. Penggunaannya adalah sebagai berikut.
+
+```dart
+// ...
+AppBar(
+  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+  title: Text(
+    "Sekoleksi",
+    style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer)
+  ),
+),
+// ...
+```
+
+```dart
+// ...
+BoxDecoration(
+  color: Theme.of(context).colorScheme.primary,
+),
+// ...
+```
+
+Dengan demikian, pewarnaan pada aplikasi Flutter menjadi konsisten dan nyaman untuk dilihat.
+
+### :arrow_right: Bagaimana cara kamu menangani navigasi dalam aplikasi dengan banyak halaman pada Flutter?
+Saya menggunakan _named routes_ untuk mengatur halaman-halaman pada Flutter. _Named routes_ tersebut diatur di widget `MaterialApp`.
+
+```dart
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // ...
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(),
+        '/product-form': (context) => const ProductFormPage(),
+      }
+    );
+  }
+}
+```
+
+Untuk pindah halaman, dapat digunakan fungsi `Navigator.pushNamed`, seperti berikut.
+
+```dart
+ListTile(
+  leading: const Icon(Icons.inventory_2_outlined),
+  title: const Text('Tambah Produk'),
+  onTap: () => Navigator.pushNamed(context, '/product-form'),
+)
+```
+
+Variabel `context` didapatkan dari argumen method `build`.
+
+</details>
