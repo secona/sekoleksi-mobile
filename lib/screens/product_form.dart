@@ -37,7 +37,6 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    maxLength: 255,
                     decoration: InputDecoration(
                       hintText: "Name",
                       labelText: "Name",
@@ -51,6 +50,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     validator: (String? value) {
                       if (value == null || value.isEmpty) {
                         return "Nama tidak boleh kosong!";
+                      }
+
+                      if (value.length > 255) {
+                        return "Panjang nama tidak boleh lebih dari 255!";
                       }
 
                       return null;
