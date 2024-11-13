@@ -170,12 +170,62 @@ Kegunaan `const` dalam Flutter adalah untuk mendeklarasikan konstanta yang tidak
 Tidak semua widget di Flutter pantas untuk digunakan `const`. Hanya widget yang tidak akan berubah, seperti yang tidak memiliki state, yang dapat digunakan `const`. Jika `const` digunakan ke widget dengan state yang akan berubah, widget tersebut tidak akan diperbarui tampilannya. 
 
 ### :arrow_right: Jelaskan dan bandingkan penggunaan Column dan Row pada Flutter. Berikan contoh implementasi dari masing-masing layout widget ini!
-Column menyusun anak-anaknya secara vertikal dari atas ke bawah. Column cocok digunakan ketika ingin menampilkan elemen-elemen dalam satu kolom seperti pada form atau list. Column biasanya diatur menggunakan `mainAxisAlignment` dan `crossAxisAlignment` untuk posisi vertikal dan horizontal elemen-elemen di dalamnya.
+Column menyusun anak-anaknya secara vertikal dari atas ke bawah. Column cocok digunakan ketika ingin menampilkan elemen-elemen dalam satu kolom seperti pada form atau list. Column biasanya diatur menggunakan `mainAxisAlignment` dan `crossAxisAlignment` untuk posisi vertikal dan horizontal elemen-elemen di dalamnya. Berikut merupakan contoh implementasi dari widget Column berupa form dengan beberapa bagian saya potong supaya tidak terlalu panjang.
 
-Row menyusun anak-anaknya secara horizontal dari kiri ke kanan. Row cocok digunakan ketika ingin menampilkan elemen-elemen dalam satu baris seperti tombol, ikon, atau informasi yang disusun sejajar. Sama seperti Column, Row biasanya diatur menggunakan `mainAxisAlignment` dan `crossAxisAlignment` untuk posisi elemen-elemen di dalamnya.
+```dart
+Form(
+  key: _formKey,
+  child: SingleChildScrollView(
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            // ...
+          ),
+        ),
+        Padding(
+          child: TextFormField(
+            // ...
+          ),
+        ),
+        Padding(
+          child: TextFormField(
+            // ...
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            child: ElevatedButton(
+              // ....
+              child: const Text(
+                // ...
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  )
+)
+```
+
+Row menyusun anak-anaknya secara horizontal dari kiri ke kanan. Row cocok digunakan ketika ingin menampilkan elemen-elemen dalam satu baris seperti tombol, ikon, atau informasi yang disusun sejajar. Sama seperti Column, Row biasanya diatur menggunakan `mainAxisAlignment` dan `crossAxisAlignment` untuk posisi elemen-elemen di dalamnya. Berikut merupakan contoh implementasi Row yang berupa menempatkan InfoCard secara horizontal.
+
+```dart
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  children: [
+    InfoCard(title: 'NPM', content: npm),
+    InfoCard(title: 'Name', content: name),
+    InfoCard(title: 'Class', content: className),
+  ],
+),
+```
 
 ### :arrow_right: Sebutkan apa saja elemen input yang kamu gunakan pada halaman form yang kamu buat pada tugas kali ini. Apakah terdapat elemen input Flutter lain yang tidak kamu gunakan pada tugas ini? Jelaskan!
-Pada halaman form, saya menggunakan widget `TextFormInput` supaya dapat berintegrasi dengan widget `Form`.
+Pada halaman form, saya menggunakan widget `TextFormInput`. Widget form lain untuk data teks adalah `TextInput`. Perbedaan antara `TextInput` dan `TextFormInput` adalah `TextInput` tidak berintegrasi dengan `Form`, sedangkan `TextFormInput` berintegrasi. Beberapa widget selain `TextFormInput` dan `TextInput` adalah `CheckBox`, `DatePicker`, `Radio`, `Slider`, `Switch`, dan `TimePicker`. Widget-widget tersebut tidak digunakan karena form yang dibuat hanya berisi teks data.
 
 ### :arrow_right: Bagaimana cara kamu mengatur tema (theme) dalam aplikasi Flutter agar aplikasi yang dibuat konsisten? Apakah kamu mengimplementasikan tema pada aplikasi yang kamu buat?
 Tema dalam aplikasi Flutter diatur dari MaterialApp pada berkas `lib/main.dart`.
