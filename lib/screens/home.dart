@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:sekoleksi_mobile/widgets/left_drawer.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,9 +11,9 @@ class HomePage extends StatelessWidget {
   final String className = 'PBP F';
 
   final List<ItemHomepage> items = [
-    ItemHomepage("Lihat Daftar Produk", Icons.inventory_2_outlined, Colors.red, ''),
+    ItemHomepage("Lihat Daftar Produk", Icons.inventory_2_outlined, Colors.red, '/product-list'),
     ItemHomepage("Tambah Produk", Icons.add, Colors.green, '/product-form'),
-    ItemHomepage("Logout", Icons.logout, Colors.blue, ''),
+    ItemHomepage("Logout", Icons.logout, Colors.blue, '/logout'),
   ];
 
   @override
@@ -64,19 +66,44 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Material(
       color: item.color,
       borderRadius: BorderRadius.circular(12),
 
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(
                 content: Text("Kamu telah menekan tombol ${item.name}")));
 
+          if (item.route == "/logout") {
+            final response = await request.logout("http://localhost:8000/auth/logout/");
+            String message = response["message"];
+            if (context.mounted) {
+              if (response['status']) {
+                String uname = response["username"];
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("$message Sampai jumpa, $uname."),
+                ));
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.pushReplacementNamed(context, '/login');
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(message)),
+                );
+              }
+            }
+
+            return;
+          }
+
           if (item.route != "") {
-            Navigator.pushNamed(context, item.route);
+            if (context.mounted) {
+              Navigator.pushNamed(context, item.route);
+            }
           }
         },
         child: Container(

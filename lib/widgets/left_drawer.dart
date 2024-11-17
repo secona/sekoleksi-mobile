@@ -40,7 +40,12 @@ class LeftDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Halaman Utama'),
-            onTap: () => Navigator.pushNamed(context, '/')
+            onTap: () => Navigator.pushNamed(context, '/home')
+          ),
+          ListTile(
+            leading: const Icon(Icons.inventory_2_outlined),
+            title: const Text('Lihat Produk'),
+            onTap: () => Navigator.pushNamed(context, '/product-list'),
           ),
           ListTile(
             leading: const Icon(Icons.inventory_2_outlined),

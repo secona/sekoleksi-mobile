@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:sekoleksi_mobile/widgets/left_drawer.dart';
 
 class ProductFormPage extends StatefulWidget {
@@ -18,6 +22,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
@@ -125,8 +131,32 @@ class _ProductFormPageState extends State<ProductFormPage> {
                         backgroundColor: WidgetStateProperty.all(
                             Theme.of(context).colorScheme.primary),
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
+                      onPressed: () async {
+                        final response = await request.postJson(
+                          "http://localhost:8000/product-flutter/",
+                          jsonEncode(<String, String>{
+                            'name': _name,
+                            'price': _price.toString(),
+                            'description': _description,
+                          }),
+                        );
+
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                                content: Text("Mood baru berhasil disimpan!"),
+                              ));
+                            Navigator.pushReplacementNamed(context, '/home');
+                          } else {
+                            ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                                content: Text("Terdapat kesalahan, silakan coba lagi."),
+                              ));
+                          }
+                        }
+
+                        if (_formKey.currentState != null && _formKey.currentState!.validate() && context.mounted) {
                           showDialog(
                             context: context,
                             builder: (context) {
@@ -147,7 +177,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                                     child: const Text('OK'),
                                     onPressed: () {
                                       Navigator.pop(context);
-                                      _formKey.currentState!.reset();
+                                      _formKey.currentState?.reset();
                                     },
                                   ),
                                 ],
