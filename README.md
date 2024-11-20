@@ -297,3 +297,314 @@ ListTile(
 Variabel `context` didapatkan dari argumen method `build`.
 
 </details>
+
+<details>
+<summary>:blue_book: Tugas 9</summary>
+
+## :blue_book: Tugas 9
+
+### :arrow_right: Jelaskan mengapa kita perlu membuat model untuk melakukan pengambilan ataupun pengiriman data JSON? Apakah akan terjadi error jika kita tidak membuat model terlebih dahulu?
+Membuat model berfungsi untuk mengubah data dalam bentuk JSON ke object Dart dan sebaliknya. Model juga berfungsi untuk validasi data sehingga meminimalisasi terjadinya kesalahan akibat ketidaksesuaian tipe. Tanpa model, kita harus menggunakan `Map<String, dynamic>` yang akan sulit untuk dikerjakan, rawan kesalahan, dan kurang terstruktur. 
+
+### :arrow_right: Jelaskan fungsi dari library http yang sudah kamu implementasikan pada tugas ini
+Library `http` digunakan untuk komunikasi antara Flutter dengan server. Contoh implementasiannya adalah pada pengambilan semua data produk user dan data produk masing-masing. Untuk tugas ini, library `http` diabstraksikan melalui package `pbp_django_auth` sebagai berikut.
+
+```dart
+final response = await request.logout("http://localhost:8000/auth/logout/");
+```
+
+```dart
+final response = await request.get('http://localhost:8000/json/${widget.id}');
+```
+
+### :arrow_right: Jelaskan fungsi dari CookieRequest dan jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+`CookieRequest` berfungsi untuk mengelola sesi pengguna dengan menyimpan token autentikasi yang diterima dari server. Ini memastikan bahwa pengguna yang sudah log in tetap terautentikasi tanpa harus login ulang. Instance dari `CookiRequest` ini dibuat sekali di `main.dart` menggunakan library `provider` dan digunakan berulang kali. Pembuatan pada `main.dart` adalah sebagai berikut.
+
+```dart
+Provider(
+  create: (_) {
+    CookieRequest request = CookieRequest();
+    return request;
+  },
+  child: MaterialApp(
+    title: 'Sekoleksi',
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+      useMaterial3: true,
+    ),
+    initialRoute: '/login',
+    routes: {
+      '/product-detail': (context) => ProductDetailPage(ModalRoute.of(context)?.settings.arguments as String),
+      '/product-form': (context) => const ProductFormPage(),
+      '/product-list': (context) => const ProductListPage(),
+      '/register': (context) => const RegisterPage(),
+      '/login': (context) => const LoginPage(),
+      '/home': (context) => HomePage(),
+    },
+  ),
+);
+```
+
+Dengan demikian, untuk menggunakan instance yang sama, setiap page dapat mengakses instance yang sama menggunakan fungsi `context.watch` dari library `provider`.
+
+```dart
+final request = context.watch<CookieRequest>();
+```
+
+### :arrow_right: Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
+Proses pengiriman data dimulai dari input pada form di Flutter. Data dari form dikonversi menjadi JSON menggunakan fungsi `jsonDecode` dan dikirim ke server menggunakan `http.post`. Lalu, server Django akan melakukan apa saja yang dibutuhkan ke data tersebut, misalnya dengan menyimpannya ke dalam database atau menjalankan logika tertentu sesuai kebutuhan aplikasi. Setelah itu, Django mengembalikan respons yang berisi data atau status hasil pemrosesan, yang kemudian diterima oleh Flutter untuk ditampilkan di antarmuka pengguna sesuai dengan kebutuhan.
+
+### :arrow_right: Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+Pada login, pengguna memasukkan email dan password, lalu Flutter mengirimkan data tersebut ke endpoint login di Django. Jika Django berhasil memverifikasi kredensial login, Django akan mengembalikan cookie atau token yang disimpan di `CookieRequest`. Pada registrasi, Flutter mengirimkan data akun baru ke Django untuk pembuatan akun. Setelah berhasil, pengguna dapat log in menggunakan data pengguna yang sudah dibuat. Logout dilakukan dengan meminta Django untuk menghapus sesi pengguna yang disimpan di server dan setelahnya, cookie atau token yang tersimpan di Flutter juga dihapus untuk mengakhiri sesi dan mengembalikan aplikasi ke status tidak terautentikasi.
+
+### :arrow_right: Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+
+#### :one: Memastikan deployment proyek tugas Django kamu telah berjalan dengan baik.
+Mengunjungi `http://muhammad-vito31-sekoleksi.pbp.cs.ui.ac.id/`
+
+#### :two: Mengimplementasikan fitur registrasi akun pada proyek tugas Flutter.
+Pertama, membuat app baru di Django dengan nama `authentication`. App ini akan digunakan oleh Flutter untuk autentikasi. Untuk registrasi, route yang dibuat adalah `register`. Pada Flutter, membuat screen baru bernama `register.dart`. Screen ini akan menggunakan route `register` yang dibuat di app `authentication` Django. Screen tersebut berisi Form yang terdapat field username, password, dan konfirmasi password. Pemanggilan endpointnya adalah sebagai berikut dengan `username`, `password1`, dan `password2` didapatkan dari form.
+
+```dart
+final response = await request.postJson(
+  "http://localhost:8000/auth/register/",
+  jsonEncode({
+    "username": username,
+    "password1": password1,
+    "password2": password2,
+  })
+);
+```
+
+#### :three: Membuat halaman login pada proyek tugas Flutter.
+Perlu dibuat route baru pada app `authentication` Django, yaitu `login`. Pada Flutter, membuat screen baru bernama `login.dart`. Screen ini akan menggunakan route `login` yang dibuat di app `authentication` Django. Screen tersebut berisi form yang terdapat field username dan password. Pemanggilan endpointnya adalah sebagai berikut dengan `username` dan `password` didapatkan dari form.
+
+```dart
+final response = await request .login("http://localhost:8000/auth/login/", {
+  'username': username,
+  'password': password,
+});
+```
+
+#### :four: Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter.
+Menggunakan `CookieRequest` untuk menyimpan token autentikasi sehingga tidak kredensial login tersimpan dan tidak perlu login berulang kali. `CookieRequest` akan digunakan berulang kali dengan menggunakan library `provider`.
+
+#### :five: Membuat model kustom sesuai dengan proyek aplikasi Django.
+Pertama, mengambil contoh respons dari server untuk model produk. Lalu, respons tersebut dimasukkan ke QuickType dan mengubah bahasanya ke Dart. Kode Dart yang dibuat oleh QuickType adalah mapping dari JSON ke object Dart. Kode ini dapat langsung ditaruh ke models di dart.
+
+<details>
+<summary>Response dari server</summary>
+
+```json
+[
+  {
+    "model": "main.product",
+    "pk": "731f5d98-6871-43aa-a7f7-de17041c439e",
+    "fields": {
+      "user": 4,
+      "name": "Berserk Vol. 1",
+      "price": 60,
+      "description": "The first volume of the critically acclaimed manga, Berserk. Follow Guts, a lone mercenary, on his quest for vengeance in a dark, medieval world."
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "e587c3dd-b101-4656-bbcf-a19b2fe745cd",
+    "fields": {
+      "user": 4,
+      "name": "Berserk Vol. 2",
+      "price": 60,
+      "description": "Continuing the dark saga of Guts and the Band of the Hawk as they clash with powerful foes."
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "4e5c5807-6978-438b-9308-2bdcde62ae61",
+    "fields": {
+      "user": 4,
+      "name": "Attack on Titan Vol. 1",
+      "price": 11,
+      "description": "Humanity struggles to survive against giant man-eating titans in a dystopian world."
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "32fff4d0-4360-445d-86d4-ece02689b7d6",
+    "fields": {
+      "user": 4,
+      "name": "Vagabond Vol. 1",
+      "price": 30,
+      "description": "Musashi"
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "67d4730a-e2e0-447d-89c0-84f8ae3da1d0",
+    "fields": {
+      "user": 4,
+      "name": "The Fragrant Flower Blooms with Dignity Vol. 1",
+      "price": 10,
+      "description": "WAGURI SAN"
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "f316e062-98e3-4600-aa5a-3030469eb167",
+    "fields": {
+      "user": 4,
+      "name": "Test",
+      "price": 60,
+      "description": "Vivamus a nibh ut elit condimentum posuere. Vivamus sit amet dui sed massa pretium posuere sit amet eget dolor. Fusce et nisi vulputate, tempus nisi ac, ultricies enim. Curabitur imperdiet, tortor at convallis porttitor, odio metus ullamcorper orci, et facilisis ligula nisi et orci. Nulla ultricies ultrices justo, a semper leo interdum vel. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nullam non lacinia lacus, nec luctus arcu. Donec bibendum gravida augue, ut imperdiet diam accumsan non. Fusce mollis venenatis libero sit amet fermentum. Duis varius faucibus porta. Sed elementum luctus metus at pulvinar. Suspendisse mauris odio, bibendum id libero vitae, pulvinar luctus ex. Phasellus tristique tellus quis elit fermentum, dictum interdum eros facilisis."
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "5f0351f8-8396-4ca7-917f-28e47a8461c3",
+    "fields": {
+      "user": 4,
+      "name": "Test 2",
+      "price": 30,
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In commodo nibh sed auctor rhoncus. Nulla molestie euismod magna, et tempor turpis tempor eget. Curabitur mattis elit eget diam gravida, nec egestas ligula dictum. Curabitur ipsum ex, iaculis nec nibh id, pulvinar posuere tortor. Aliquam id turpis luctus, ornare nibh eget, semper mauris. Mauris ornare aliquam magna at volutpat. Aenean a sapien nisl. Vivamus volutpat metus lacus, pulvinar egestas tellus facilisis ut."
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": "9808a66c-76d6-425c-a331-a276db901609",
+    "fields": {
+      "user": 4,
+      "name": "df",
+      "price": 123,
+      "description": "123"
+    }
+  }
+]
+```
+</details>
+
+#### :six: Membuat halaman yang berisi daftar semua item yang terdapat pada endpoint JSON di Django yang telah kamu deploy.
+Ini dilakukan di screen bernama `product_list.dart`. Implementasinya menggunakan route `json` pada Django. Pada dasarnya, akan mengambil data dari backend dan memetakannya ke widget di Flutter. Fungsi untuk mengambil datanya adalah sebagai berikut.
+
+```dart
+  Future<List<Product>> fetchProducts(CookieRequest request) async {
+    final response = await request.get('http://localhost:8000/json/');
+    
+    var data = response;
+    
+    List<Product> listMood = [];
+    for (var d in data) {
+      if (d != null) {
+        listMood.add(Product.fromJson(d));
+      }
+    }
+    return listMood;
+  }
+```
+
+Widget untuk memetakan datanya adalah `ListView` seperti berikut.
+
+```dart
+ListView.builder(
+  itemCount: snapshot.data!.length,
+  itemBuilder: (_, index) => Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+    child: InkWell(
+      onTap: () => Navigator.pushNamed(context, '/product-detail', arguments: snapshot.data![index].pk),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${snapshot.data![index].fields.name}",
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text("${snapshot.data![index].fields.price}"),
+              const SizedBox(height: 10),
+              Text("${snapshot.data![index].fields.description}"),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ),
+);
+```
+
+#### :seven: Membuat halaman detail untuk setiap item yang terdapat pada halaman daftar Item.
+Ini dilakukan di screen bernama `product_detail.dart`. Implementasinya menggunakan route `show_json_by_id` di Django. Screen ini membutuhkan id untuk bisa melakukan fetch data sehingga perlu satu atribut bernama id dengan tipe String pada `ProductDetailPage`. Fungsi untuk mengambil detail produk adalah sebagai berikut.
+
+```dart
+  Future<Product> fetchProduct(CookieRequest request) async {
+    final response = await request.get('http://localhost:8000/json/${widget.id}');
+    return Product.fromJson(response[0]);
+  }
+```
+
+Widget untuk menampilkan detail produk adalah menggunakan `FutureBuilder` sebagai berikut. Widget tersebut akan mem-_build_ ketika future yang diberikan sudah selesai. 
+
+```dart
+FutureBuilder(
+  future: fetchProduct(request),
+  builder: (context, AsyncSnapshot<Product> snapshot) {
+    if (snapshot.data == null) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      if (!snapshot.hasData) {
+        return const Column(
+          children: [
+            Text('Belum ada produk.'),
+            SizedBox(height: 8),
+          ],
+        );
+      } else {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          child: Column(
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        snapshot.data!.fields.name,
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text("${snapshot.data!.fields.price}"),
+                      const SizedBox(height: 10),
+                      Text(snapshot.data!.fields.description),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                child: const Text('Back'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  },
+),
+);
+```
+
+#### :eight: Melakukan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login.
+Ini sudah diimplementasi dari Django secara langsung. Setiap ada permintaan ke `/json`, Django akan mengecek user yang sudah terautentikasi dan mengembalikan produk untuk user tersebut. Dengan demikian, tidak perlu mem-_filter_ pada Flutter.
+
+</details>
